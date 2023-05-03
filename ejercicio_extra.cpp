@@ -9,29 +9,15 @@ private:
     float& referenciaprecio=precio;
 public:
     Abarrotes(){
-        this -> nombre=nombre;
-        this -> cantidad=cantidad;
-        this -> precio=precio;
+        nombre = " ";
+        precio = 0.0;
+        cantidad= 0;
     }
-    string getnombre()
-    {
-        return nombre;
-    }
-    int getcantidad()
-    {
-        return cantidad;
-    }
-    float getprecio()
-    {
-        return precio;
-    }
-    float getReferencia(){
-        return referenciaprecio;
-    }
-    Abarrotes& setNombre(string nombre){
-        this -> nombre=nombre;
-        return *this;
-    }
+    string getnombre(){return nombre;}
+    int getcantidad(){return cantidad;}
+    float getprecio(){return precio;}
+    float getReferencia(){return referenciaprecio;}
+    Abarrotes& setNombre(string nombre){this -> nombre=nombre;return *this;}
     Abarrotes& setCantidad(int cantidad){this-> cantidad=cantidad; return *this;}
     Abarrotes& setReferencia(float referencia){this -> referenciaprecio=referencia;return *this;}
     
@@ -43,67 +29,147 @@ private:
     string nombre;
     int dni;
 public:
-    Cliente(string nombre, int dni){
-        this->nombre=nombre;
-        this->dni=dni;
+    Cliente(){
+        nombre =" ";
+        dni = 0;
     }
-    string getNombre(){
-        return nombre;
-    }
-    int getDni(){
-        return dni;
-    }
+    Cliente& setNombreCliente(string nombre){this->nombre=nombre;return *this;}
+    Cliente& setDNI(int dni){this->dni=dni;return *this;}
+    string getNombre(){return nombre;}
+    int getDni(){return dni;}
 };
+
 class Ventas{
 private:
-    float precio_total;
+    float total;
     string metodo_pago;
-    Abarrotes* producto1;
-    Cliente* cliente1;
+    int num_abarrotes,num_clientes;
+    Abarrotes* producto1[100];
+    Cliente* cliente1[100];
 public:
+    ~Ventas() ;
+    ~Ventas(){}
     Ventas(){
-        this ->precio_total =precio_total;
-        this ->metodo_pago=metodo_pago;
+        total= 0.0;
+        metodo_pago = " "; 
     }
-    ~Ventas() {
-        delete producto1;
-        delete cliente1;
+    
+    string getMetodo(){return metodo_pago;}
+    float PagoTotal(){
+        float total = 0.0;
+        for (int i = 0; i < num_abarrotes; i++) {
+            total += producto1[i]->getprecio() * producto1[i]->getcantidad();
+        }
+        cout << total;
+    }
+    void metodoPago(string metodo_pago){this -> metodo_pago=metodo_pago;}
+    void agregarAbarrotes(Abarrotes* producto) {
+        if (num_abarrotes < 100) {
+            producto1[num_abarrotes] = producto;
+            num_abarrotes++;
+        }
     }
 
-    void setProducto(Abarrotes* producto) {
-        this->producto1 = producto;
+    void agregarCliente(Cliente* cliente) {
+        if (num_clientes < 100) {
+            cliente1[num_clientes] = cliente;
+            num_clientes++;
+        }
     }
 
-    void setCliente(Cliente* cliente) {
-        this->cliente1 = cliente;
-    }
 
-    void boleta(Abarrotes producto){
-        cout << "--- producto---"<<endl;
-        cout<<producto.getnombre()<<endl;
-        cout<<producto.getcantidad()<<endl;
-        cout<<producto.getReferencia()<<endl;
+     void boleta() {
+        cout << "--- Cliente ---" << endl;
+        if (num_clientes > 0) {
+            for (int i = 0; i < num_clientes; i++) {
+                cout << "Nombre: " << cliente1[i]->getNombre() << endl;
+                cout << "DNI: " << cliente1[i]->getDni() << endl;
+                cout << "----------------------" << endl;
+            }
+        }
+        else {
+            cout << "No hay clientes registrados." << endl;
+        }
 
+        cout << "--- Productos ---" << endl;
+        if (num_abarrotes > 0) {
+            for (int i = 0; i < num_abarrotes; i++) {
+                cout << "Nombre: " << producto1[i]->getnombre() << endl;
+                cout << "Cantidad: " << producto1[i]->getcantidad() << endl;
+                cout << "Precio: " << producto1[i]->getReferencia() << endl;
+                cout << "----------------------" << endl;
+            }
+        }
+        else {
+            cout << "No hay productos registrados." << endl;
+        }
+
+        cout << "Metodo de pago: " << metodo_pago << endl;
+        cout << "Precio total: " << total << endl;
     }
 
 };
+
 
 int main(){
     Abarrotes* producto1 = new Abarrotes();
-    producto1->setNombre("Leche").setCantidad(3).setReferencia(3.90);
-
-    Ventas* boleta1 = new Ventas();
-    boleta1->setProducto(producto1);
-    boleta1->boleta(*producto1);
-
-    Cliente* cliente1 = new Cliente("EladioCarrion", 987654321);
-    cout << cliente1->getNombre() << endl;
-    cout << cliente1->getDni() << endl;
+    Cliente* cliente1 = new Cliente();
+    Ventas* boleta1 =new Ventas();
+    string nom_cliente, nom_abarrotes,metodo_pago;
+    int opcion,dni,cantidad;
+    float precio;
+    do
+    {
+        cout <<"---------MENU---------"<<endl;
+        cout <<" 1. Agregar Cliente "<<endl;
+        cout <<" 2. Agregar Producto "<<endl;
+         cout <<" 3. Metodo de pago "<<endl;
+        cout <<" 4. Imprimir boleta "<<endl;
+        cout <<" 5. Salir "<<endl;
+        cout << "Ingrese una opcion: ";
+        cin>>opcion;
+        switch (opcion)
+        {
+        case 1:{
+            cout << "Ingrese el nombre del cliente: ";
+            cin >> nom_cliente;
+            cout << " Ingrese el DNI del cliente: ";
+            cin >> dni;
+            cliente1->setNombreCliente(nom_cliente).setDNI(dni);
+            boleta1->agregarCliente(cliente1);
+        }
+            break;
+        case 2:{
+            
+            cout << "Ingrese el nombre del producto: ";
+            cin >> nom_abarrotes;
+            cout << "Ingrese la cantidad: ";
+            cin >> cantidad;
+            cout << "Ingrese el precio: ";
+            cin >>precio;
+            producto1->setNombre(nom_abarrotes).setCantidad(cantidad).setReferencia(precio);
+            boleta1->agregarAbarrotes(producto1);
+            break;
+        }
+        case 3:{cout << "Ingrese el metodo de pago: ";
+            cin >>metodo_pago; 
+            boleta1->metodoPago(metodo_pago);
+            break;}
+        case 4:
+            boleta1->boleta();
+            boleta1->PagoTotal();
+            break;
+        case 5:cout << "Fin del programa...";
+            break;
+        default:cout << "opcion no encontrada";
+        }
+    } while (opcion !=5);
+    
 
     delete producto1;
-    delete boleta1;
     delete cliente1;
-
+    delete boleta1;
+    
     return 0;
 
   
